@@ -134,3 +134,5 @@ app.listen(1337, () => {
 
 
 In this article, we've walked through the process of exploiting an SSRF vulnerability, leveraging HTTP/1.0 downgrades to manipulate server behavior, and capturing sensitive data through crafted HTTP requests. By following this methodology, attackers can exfiltrate secrets from vulnerable applications, while defenders can use the outlined mitigations to secure their systems from such attacks. Always be aware of SSRF risks and take proactive steps to mitigate them.
+
+![image](assets/ach/dusty_alley.png)
