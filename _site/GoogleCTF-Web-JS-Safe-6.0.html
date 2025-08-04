@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Web - JS Safe 6.0 - GoogleCTF</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Web - JS Safe 6.0 - GoogleCTF | c0derpwner BlogSpot</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Web - JS Safe 6.0 - GoogleCTF" />
+<meta name="author" content="c0derpwnergit remote add origin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Challenge description: You stumbled upon someone’s “JS Safe” on the web. It’s a simple HTML file that can store secrets in the browser’s localStorage. This means that you won’t be able to extract any secret from it (the secrets are on the computer of the owner), but it looks like it was hand-crafted to work only with the password of the owner. Another year, another JS Safe challenge! I’m always looking forward to this challenge during Google CTF." />
+<meta property="og:description" content="Challenge description: You stumbled upon someone’s “JS Safe” on the web. It’s a simple HTML file that can store secrets in the browser’s localStorage. This means that you won’t be able to extract any secret from it (the secrets are on the computer of the owner), but it looks like it was hand-crafted to work only with the password of the owner. Another year, another JS Safe challenge! I’m always looking forward to this challenge during Google CTF." />
+<link rel="canonical" href="http://localhost:4000/GoogleCTF-Web-JS-Safe-6.0" />
+<meta property="og:url" content="http://localhost:4000/GoogleCTF-Web-JS-Safe-6.0" />
+<meta property="og:site_name" content="c0derpwner BlogSpot" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-08-04T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Web - JS Safe 6.0 - GoogleCTF" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"c0derpwnergit remote add origin","url":"https://ashishchaudhary.in/hacker-blog"},"dateModified":"2025-08-04T00:00:00+02:00","datePublished":"2025-08-04T00:00:00+02:00","description":"Challenge description: You stumbled upon someone’s “JS Safe” on the web. It’s a simple HTML file that can store secrets in the browser’s localStorage. This means that you won’t be able to extract any secret from it (the secrets are on the computer of the owner), but it looks like it was hand-crafted to work only with the password of the owner. Another year, another JS Safe challenge! I’m always looking forward to this challenge during Google CTF.","headline":"Web - JS Safe 6.0 - GoogleCTF","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/GoogleCTF-Web-JS-Safe-6.0"},"url":"http://localhost:4000/GoogleCTF-Web-JS-Safe-6.0"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>c0derpwner@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Web - JS Safe 6.0 - GoogleCTF</h2>
+  <time datetime="2025-08-04T00:00:00+02:00" class="by-line">04 Aug 2025</time>
+  <p>Challenge description: You stumbled upon someone’s “JS Safe” on the web. It’s a simple HTML file that can store secrets in the browser’s localStorage. This means that you won’t be able to extract any secret from it (the secrets are on the computer of the owner), but it looks like it was hand-crafted to work only with the password of the owner. Another year, another JS Safe challenge! I’m always looking forward to this challenge during Google CTF.</p>
+
+<p>Opening the HTML file, we see this suspect code:</p>
+
+<p><img src="/assets/js_safe1.png" alt="" /></p>
+
+<p>But it appears to be just the background cube.</p>
+
+<p>The “usage instructions” to unlock the safe are:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Open the page in Chrome (the only supported browser)
+Open Dev Tools and type:
+anti(debug); // Industry-leading antidebug!
+unlock("password"); // -&gt; alert(secret)
+</code></pre></div></div>
+
+<p>A “render loop” is created using <code class="language-plaintext highlighter-rouge">setInterval(renderFrame, frameInterval)</code> which spams the DevTools console (with <code class="language-plaintext highlighter-rouge">clear()</code> and the “usage instructions”).</p>
+
+<p>Scrolling further down the file, now comes the juicy parts, the <code class="language-plaintext highlighter-rouge">anti(debug)</code> function:</p>
+
+<p><img src="/assets/js_safe2.png" alt="" /></p>
+
+<p>A bunch of “looks like space but is another character”-symbols are in use. From previous years’ JS Safe challenges we know that replacing these bytes with proper spaces will most likely break the code.</p>
+
+<p>Finally the unlock function looks fairly simple:</p>
+
+<p><img src="/assets/js_safe3.png" alt="" /></p>
+
+<p>From my understanding it is going to instrument the prototype of lots of common things (arrays, console, etc) such that when calling .get (i.e. property access), the step-value will be incremented. This means we can’t just sprinkle console.log calls everywhere, as that would increase the step value and break the decryption logic.
+Further anti-debugging in instrument</p>
+
+<p>When initially calling anti(…) we pass the variable debug [1], which ends up inside instrument() that checks two conditions:
+document.documentElement.outerHTML.length !== 14347
+This is fairly easy to bypass, whenever I change the source file I need to update the “total document length”.</p>
+
+<p>But the next check is even weirder:</p>
+
+<p>debug(f, “window.c &amp;&amp; function perf(){ const l = <code class="language-plaintext highlighter-rouge">" + f + "</code>.length; window.step += l; }() // poor man’s ‘performance counter`”);
+Normally f.length would be the string length of the function f, but why the backticks (template literals)? What does f expand to?
+But what looks even more suspicious is the comment which quotes using a single-quote and end the quote with a backtick (spider senses tingling!)
+Modifying the code</p>
+
+<p>Let’s start by commenting the console.clear(); and console.log(content); to improve the debugging experience. This adds 4 extra characters, so we also need to update the outerHTML.length check:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">220,221c220,221
+</span><span class="gd">&lt;     console.clear();
+&lt;     console.log(content);
+</span><span class="p">---
+</span><span class="gi">&gt;     //console.clear();
+&gt;     //console.log(content);
+</span><span class="p">285c285
+</span><span class="gd">&lt;     debug(f, "document.documentElement.outerHTML.length !== 14347");
+</span><span class="p">---
+</span><span class="gi">&gt;     debug(f, "document.documentElement.outerHTML.length !== 14351");
+</span></code></pre></div></div>
+
+<p>But keeping track of outerHTML is a bit tedious, so another minimal modification is to change the outerHTML statement from !== realSize to === falseSize, i.e. the logic is the same, but we don’t need to update the value when modifying the rest of the file:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">285c285
+</span><span class="gd">&lt;     debug(f, "document.documentElement.outerHTML.length !== 14347");
+</span><span class="p">---
+</span><span class="gi">&gt;     debug(f, "document.documentElement.outerHTML.length === 99999");
+</span></code></pre></div></div>
+
+<p>Note: why not just change it to “false” ? We believe the check-function will verify check.toString().length, but we are a bit unsure how - so lets not modify the length of the check-function but doesn’t work….</p>
+
+<p>I get this warning when opening the modified challenge file in my browser:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Refused to execute inline script because it violates the following Content Security Policy directive: 
+<span class="s2">"script-src 'sha256-P8konjutLDFcT0reFzasbgQ2OTEocAZB3vWTUbDiSjM=' 'sha256-eDP6HO9Yybh41tLimBrIRGHRqYoykeCv2OYpciXmqcY=' 'unsafe-eval'"</span><span class="nb">.</span>
+Either the <span class="s1">'unsafe-inline'</span> keyword, a <span class="nb">hash</span> <span class="o">(</span><span class="s1">'sha256-C7RyoweJ1Looccbu94IGsrn5T/cazOvY7o8EuZZPQJA='</span><span class="o">)</span>, 
+or a nonce <span class="o">(</span><span class="s1">'nonce-...'</span><span class="o">)</span> is required to <span class="nb">enable </span>inline execution.
+</code></pre></div></div>
+
+<p>In the top of the HTML file, we see this inlined CSP:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"Content-Security-Policy"</span> <span class="na">id=</span><span class="s">"c"</span> <span class="na">content=</span><span class="s">"script-src 'sha256-P8konjutLDFcT0reFzasbgQ2OTEocAZB3vWTUbDiSjM=' 'sha256-eDP6HO9Yybh41tLimBrIRGHRqYoykeCv2OYpciXmqcY=' 'unsafe-eval'"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>We could just remove the CSP completely, but we want to keep the changes minimal. Again the spider senses are tingling, why does the CSP have id=”c”? Why would a CSP-meta element ever need an ID?
+Remember the instrument contained this code window.c &amp;&amp; function perf(){ … }, but also at the very top of the anti(debug)-function we see:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+window.step = 0;
+window.cﾠ= true; // Countﾠstepsﾠwith debug (prototype instrumentation is separate)
+window.success = false;
+</code></pre></div></div>
+
+<p>So clearly window.c is true regardless of the CSP HTML element, right? Spoiler: No, as I later learned, the whitespace after window.c (i.e. window.c[HERE]=true;) is not actually a whitespace, but a valid javascript identifier, meaning window.c != window.cﾠ!</p>
+
+<p>Our new modification to the file is now:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">7c7
+</span><span class="gd">&lt; &lt;meta http-equiv="Content-Security-Policy" id="c" content="script-src 'sha256-P8konjutLDFcT0reFzasbgQ2OTEocAZB3vWTUbDiSjM=' 'sha256-eDP6HO9Yybh41tLimBrIRGHRqYoykeCv2OYpciXmqcY=' 'unsafe-eval'"&gt;
+</span><span class="p">---
+</span><span class="gi">&gt; &lt;meta http-equiv="Content-Security-Policy" id="c" content="script-src 'unsafe-inline' 'unsafe-eval'"&gt;
+</span></code></pre></div></div>
+
+<h2 id="setting-breakpoints">Setting breakpoints</h2>
+
+<p>A quick’n’dirty way of solving the challenge would be setting a breakpoint on <code class="language-plaintext highlighter-rouge">flag[0] == pool[...]</code> and bruteforce one flag character at a time. But setting a breakpoint in DevTools doesn’t trigger?!  Lets go up one level and set a breakpoint on <code class="language-plaintext highlighter-rouge">anti(debug)</code>, this should work as nothing weird has been run before that call. Stepping though <code class="language-plaintext highlighter-rouge">anti(debug)</code>, we see another sneaky trick, in <code class="language-plaintext highlighter-rouge">renderFrame()</code> the call to <code class="language-plaintext highlighter-rouge">multiline(...)</code> (logic for the big spinning cube) has redefines the global <code class="language-plaintext highlighter-rouge">r</code> function to become <code class="language-plaintext highlighter-rouge">ROT-47</code>, so now the cube block decrypts as:</p>
+
+<p><img src="/assets/js_safe4.png" alt="" /></p>
+
+<p>This checks <code class="language-plaintext highlighter-rouge">c.outerHTML.length*2 == 386 &amp;&amp; (new Error).stack.split('eval').length&gt;4</code></p>
+
+<p>So if we change the length of the CSP or the stack trace is not correct, then <code class="language-plaintext highlighter-rouge">window.step</code> will be set to a wrong value and the decryption will not work! We fix this by padding the CSP with spaces.</p>
+
+<h4 id="escaping-the-debugger">Escaping the debugger</h4>
+
+<p>We know <code class="language-plaintext highlighter-rouge">instrument</code>is called with the prototypes of many common values, so I uncommented that (inside anti(debug)) 
+and added: <code class="language-plaintext highlighter-rouge">[].flat().concat(check, eval).forEach(instrument);</code>.
+We can’t step into the <code class="language-plaintext highlighter-rouge">debug(f, "...")</code> function, but we can replace it with a <code class="language-plaintext highlighter-rouge">console.log(...)</code> to figure out what that <code class="language-plaintext highlighter-rouge">f</code> expands to:
+<img src="/assets/js_safe5.png" alt="" /></p>
+
+<p>This gives us the following code being run in the “debug context”:</p>
+
+<p><img src="/assets/js_safe6.png" alt="" /></p>
+
+<p>Now we finally see the check()-code properly expanded (and the while(true) debugger active).
+We also see the rest of the build-in functions will not “escape”, as they will expand into the string “[native code]”, e.g. for eval this gives:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">c</span> <span class="o">&amp;&amp;</span> <span class="kd">function</span> <span class="nf">perf</span><span class="p">(){</span> <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="s2">`function eval() { [native code] }`</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">step</span> <span class="o">+=</span> <span class="nx">l</span><span class="p">;</span> <span class="p">}()</span> <span class="c1">// poor man's 'performance counter`</span>
+</code></pre></div></div>
+
+<h2 id="bxefxbexa0-as-a-valid-identifier">b’\xef\xbe\xa0’ as a valid identifier</h2>
+
+<p>Another cool trick; remember how the global function <code class="language-plaintext highlighter-rouge">r</code> was overriden in <code class="language-plaintext highlighter-rouge">check()</code>, i.e:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">k</span> <span class="c1">// ROT13 TODO:ﾠuse thisfor anﾠadditional encryption layerﾠ</span>
+<span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">s</span><span class="p">){</span><span class="nx">returnt</span> <span class="nf">toString</span><span class="p">().</span><span class="nf">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[</span><span class="sr">a-z</span><span class="se">]</span><span class="sr">/gi</span><span class="p">,</span><span class="nx">c</span><span class="o">=&gt;</span><span class="p">(</span><span class="nx">c</span><span class="o">=</span><span class="nx">c</span><span class="p">.</span><span class="nf">charCodeAt</span><span class="p">(),</span><span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">((</span><span class="nx">c</span><span class="o">&amp;</span><span class="mi">95</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">78</span><span class="p">?</span><span class="nx">c</span><span class="o">+</span><span class="mi">13</span><span class="p">:</span><span class="nx">c</span><span class="o">-</span><span class="mi">13</span><span class="p">)));}</span>
+</code></pre></div></div>
+
+<p>But actually that “space” (<code class="language-plaintext highlighter-rouge">\xef\xbe\xa0</code>) in front of the equals symbol (<code class="language-plaintext highlighter-rouge">[HERE]= function { ... }</code>) is a valid javascript identifier!</p>
+
+<p>This means that the following code:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">pool</span> <span class="o">=</span><span class="nx">ﾠ</span><span class="s2">`?o&gt;</span><span class="se">\`</span><span class="s2">Wn0o0U0N?05o0ps}q0|mt</span><span class="se">\`</span><span class="s2">ne</span><span class="se">\`</span><span class="s2">us&amp;400_pn0ss_mph_0</span><span class="se">\`</span><span class="s2">5`</span><span class="p">;</span>
+<span class="nx">pool</span> <span class="o">=</span> <span class="nf">r</span><span class="p">(</span><span class="nx">pool</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Is actually two(!) function calls, first <code class="language-plaintext highlighter-rouge">tmp = \xef\xbe\xa0("?o&gt;...5")</code> then <code class="language-plaintext highlighter-rouge">pool = r(tmp)</code>.</p>
+
+<p>Furthermore the <em>looks like space but isn’t</em> symbol is also used in the function <code class="language-plaintext highlighter-rouge">double</code></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">double</span> <span class="o">=</span> <span class="nb">Function</span><span class="p">.</span><span class="nx">call</span><span class="s2">`window.stepﾠ*= 2`</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>So the above code will not change <code class="language-plaintext highlighter-rouge">window.step</code> when called (but instead change <code class="language-plaintext highlighter-rouge">"window.stepﾠ"</code> variable).</p>
+
+<h3 id="modifying-check-and-printing-flag-chars">Modifying <code class="language-plaintext highlighter-rouge">check()</code> and printing flag chars</h3>
+
+<p>Now we’re comfortable modifying the <code class="language-plaintext highlighter-rouge">check()</code> code and patching out <code class="language-plaintext highlighter-rouge">check.toString().length !== 914</code> anti-debug trick.</p>
+
+<p>We can modify the <code class="language-plaintext highlighter-rouge">while (!window.success) { ... }</code> loop such that instead of comparing each flag char, we print the expected value and continue.</p>
+
+<p><img src="/assets/js_safe_final.png" alt="" /></p>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>c0derpwner</b>
+    </span>
+    
+    <span>© 2025</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

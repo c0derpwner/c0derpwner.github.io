@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Crypto - Numerology - GoogleCTF</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Crypto - Numerology - GoogleCTF | c0derpwner BlogSpot</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Crypto - Numerology - GoogleCTF" />
+<meta name="author" content="c0derpwnergit remote add origin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Crypto" />
+<meta property="og:description" content="Crypto" />
+<link rel="canonical" href="http://localhost:4000/GoogleCTF-Crypto-Numerology" />
+<meta property="og:url" content="http://localhost:4000/GoogleCTF-Crypto-Numerology" />
+<meta property="og:site_name" content="c0derpwner BlogSpot" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-08-04T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Crypto - Numerology - GoogleCTF" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"c0derpwnergit remote add origin","url":"https://ashishchaudhary.in/hacker-blog"},"dateModified":"2025-08-04T00:00:00+02:00","datePublished":"2025-08-04T00:00:00+02:00","description":"Crypto","headline":"Crypto - Numerology - GoogleCTF","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/GoogleCTF-Crypto-Numerology"},"url":"http://localhost:4000/GoogleCTF-Crypto-Numerology"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>c0derpwner@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Crypto - Numerology - GoogleCTF</h2>
+  <time datetime="2025-08-04T00:00:00+02:00" class="by-line">04 Aug 2025</time>
+  <h2 id="crypto">Crypto</h2>
+
+<p>The only one i did was <code class="language-plaintext highlighter-rouge">Numerology</code> an easy cryptography challenge where it was presented a custom stream cipher inspired by ChaCha20, but with a twist: it uses only a single round of mixing operations.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">crypto_numerology.py</code>: The cipher implementation</li>
+  <li><code class="language-plaintext highlighter-rouge">ctf_challenge_package.json</code>: JSON dataset of known plaintext/ciphertext pairs, together with the key and encrypted flag</li>
+  <li><code class="language-plaintext highlighter-rouge">init.sh</code>: Challenge generation script</li>
+  <li><code class="language-plaintext highlighter-rouge">flag.txt</code>: Sample flag</li>
+  <li><code class="language-plaintext highlighter-rouge">readme.md</code>: Brief description</li>
+</ul>
+
+<p>The cipher in <code class="language-plaintext highlighter-rouge">crypto_numerology.py</code> is based on <a href="https://cr.yp.to/chacha.html">ChaCha20</a>, but heavily modified:</p>
+
+<ul>
+  <li>It allows <strong>1 to 8 single-round operations</strong> (not 20 double-rounds like real ChaCha20).</li>
+  <li>Each round applies one quarter-round function from a static list of 8.</li>
+  <li>It uses a fixed set of constants (<code class="language-plaintext highlighter-rouge">CHACHA_CONSTANTS</code>) in state setup.</li>
+  <li>Like ChaCha20, the output keystream is generated from a 512-bit (64-byte) block.</li>
+</ul>
+
+<h3 id="make_block"><code class="language-plaintext highlighter-rouge">make_block(...)</code></h3>
+
+<p>The keystream is generated via this function:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">make_block</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="p">,</span> <span class="n">counter_int</span><span class="p">,</span> <span class="n">constants</span><span class="p">,</span> <span class="n">rounds</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</code></pre></div></div>
+<p><strong>Steps to generate one <code class="language-plaintext highlighter-rouge">keystream_block</code>:</strong></p>
+
+<ol>
+  <li><strong>Initialize state</strong> as a 16-word array:
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">state</span><span class="p">[</span><span class="mf">0.</span><span class="p">.</span><span class="mi">4</span><span class="p">]</span>   <span class="o">=</span> <span class="n">constants</span>
+<span class="n">state</span><span class="p">[</span><span class="mf">4.</span><span class="p">.</span><span class="mi">12</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">256</span><span class="o">-</span><span class="n">bit</span> <span class="n">key</span> <span class="n">split</span> <span class="n">into</span> <span class="mi">8</span> <span class="n">words</span>
+<span class="n">state</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span>     <span class="o">=</span> <span class="nf">counter </span><span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">)</span>
+<span class="n">state</span><span class="p">[</span><span class="mf">13.</span><span class="p">.</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="mi">96</span><span class="o">-</span><span class="n">bit</span> <span class="n">nonce</span> <span class="n">split</span> <span class="n">into</span> <span class="mi">3</span> <span class="n">words</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Save the initial state.</strong></p>
+  </li>
+  <li><strong>Apply up to 8 single quarter-rounds</strong> (from a list) based on <code class="language-plaintext highlighter-rouge">rounds</code> value:
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">qr_operations_sequence</span> <span class="o">=</span> <span class="p">[</span>
+<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+<span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span>
+<span class="bp">...</span>
+<span class="p">]</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Add the original state back to the modified state</strong>.</p>
+  </li>
+  <li><strong>Convert the state into bytes</strong> and return it.</li>
+</ol>
+
+<p>The resulting 64-byte block is XOR-ed with the message bytes to encrypt or decrypt.</p>
+
+<hr />
+<h2 id="known-plaintext-ciphertext-analysis">Known Plaintext-Ciphertext Analysis</h2>
+
+<p>The challenge gave use a json which has ~60 plaintext/ciphertext pairs using the same key and plaintext but different counters and nonces (<code class="language-plaintext highlighter-rouge">000010...</code>, <code class="language-plaintext highlighter-rouge">000020...</code>). This gave us insight into how the keystream evolves with counter changes.</p>
+
+<hr />
+<h2 id="how-to-solve">How to Solve</h2>
+
+<p>The flag ciphertext was given in <code class="language-plaintext highlighter-rouge">ctf_challenge_package.json</code>. We were given:</p>
+
+<ul>
+  <li>The <strong>key</strong> is known.</li>
+  <li>The <strong>nonce</strong> used for the flag could be one of the many seen in training.</li>
+  <li>The <strong>counter</strong> is unknown.</li>
+</ul>
+
+<h3 id="-trick">🔑 Trick</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">get_bytes</code> function could also be used for decryption.</p>
+
+<p>Just by using a sample <strong>nonce = <code class="language-plaintext highlighter-rouge">000010000000000000000000</code></strong> and a random counter <code class="language-plaintext highlighter-rouge">1</code>, we could recover more than a half of the flag.</p>
+
+<p>We brute-forced the <strong>counter</strong> by regenerating keystream blocks for increasing values, and XOR-ing them against the flag ciphertext until we found a meaningful ASCII string starting with <code class="language-plaintext highlighter-rouge">CTF{</code>.</p>
+
+<hr />
+<h2 id="4-flag">4. Flag</h2>
+
+<p>After brute-forcing the correct counter value (with fixed key and nonce), we obtained:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CTF{w3_aRe_g0Nn@_ge7_MY_FuncKee_monkey_!!}
+</code></pre></div></div>
+<p>✅ DONE</p>
+
+<hr />
+<h2 id="5-key-points">5. Key Points</h2>
+
+<ul>
+  <li>The cipher is ChaCha-like, but weak due to:
+    <ul>
+      <li>Very few rounds (only 1 round used in the challenge).</li>
+      <li>Entire keystream block predictable and brute-forceable.</li>
+    </ul>
+  </li>
+  <li>Known-plaintext keystream recovery made it easy to test candidate counter values.</li>
+  <li>Only 96-bit nonces and 32-bit counters — practical to brute-force if reduced rounds are used.</li>
+</ul>
+
+<hr />
+
+<h2 id="takeaways">Takeaways</h2>
+
+<ul>
+  <li>Modified ciphers often introduce weaknesses even if based on strong primitives.</li>
+  <li>Stream ciphers + known plaintext = keystream recovery.</li>
+  <li>With known key and enough samples, brute-forcing a 32-bit counter is very feasible.</li>
+</ul>
+
+<h3 id="solver">Solver</h3>
+
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">argparse</span>
+<span class="kn">import</span> <span class="n">json</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="kn">import</span> <span class="n">struct</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="kn">from</span> <span class="n">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="n">binascii</span> <span class="kn">import</span> <span class="n">hexlify</span><span class="p">,</span> <span class="n">unhexlify</span>
+<span class="n">CHACHA_CONSTANTS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1634760805</span><span class="p">,</span> <span class="mi">857760878</span><span class="p">,</span> <span class="mi">2036477234</span><span class="p">,</span> <span class="mi">1797285236</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">rotl32</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Rotate a 32-bit unsigned integer left by c bits.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="n">v</span> <span class="o">&amp;=</span> <span class="mi">4294967295</span>
+    <span class="k">return</span> <span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="n">c</span> <span class="o">&amp;</span> <span class="mi">4294967295</span> <span class="o">|</span> <span class="n">v</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span> <span class="o">-</span> <span class="n">c</span>
+
+<span class="k">def</span> <span class="nf">add32</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Add two 32-bit unsigned integers, wrapping modulo 2^32.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">&amp;</span> <span class="mi">4294967295</span>
+
+<span class="k">def</span> <span class="nf">bytes_to_words</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Convert a byte string (little-endian) to a list of 32-bit words.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">Input bytes length must be a multiple of 4 for word conversion.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">list</span><span class="p">(</span><span class="n">struct</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="sh">'</span><span class="s">&lt;</span><span class="sh">'</span> <span class="o">+</span> <span class="sh">'</span><span class="s">I</span><span class="sh">'</span> <span class="o">*</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">//</span> <span class="mi">4</span><span class="p">),</span> <span class="n">b</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">words_to_bytes</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Convert a list of 32-bit words to a little-endian byte string.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="k">return</span> <span class="n">struct</span><span class="p">.</span><span class="nf">pack</span><span class="p">(</span><span class="sh">'</span><span class="s">&lt;</span><span class="sh">'</span> <span class="o">+</span> <span class="sh">'</span><span class="s">I</span><span class="sh">'</span> <span class="o">*</span> <span class="nf">len</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="o">*</span><span class="n">w</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">state_list</span><span class="p">,</span> <span class="n">a_idx</span><span class="p">,</span> <span class="n">b_idx</span><span class="p">,</span> <span class="n">c_idx</span><span class="p">,</span> <span class="n">d_idx</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="se">\n</span><span class="s">    Mixes Bits. Modifies state_list in-place.</span><span class="se">\n</span><span class="s">    </span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">state_list</span><span class="p">[</span><span class="n">a_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">b_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">c_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">d_idx</span><span class="p">])</span>
+    <span class="c1">#print("mix_bits 0", a, b, c, d)
+</span>    <span class="n">a</span> <span class="o">=</span> <span class="nf">add32</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">^=</span> <span class="n">a</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nf">rotl32</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nf">add32</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">^=</span> <span class="n">c</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nf">rotl32</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nf">add32</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">^=</span> <span class="n">a</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nf">rotl32</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nf">add32</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">^=</span> <span class="n">c</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nf">rotl32</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+    <span class="c1">#print("mix_bits 1", a, b, c, d)
+</span>    <span class="n">state_list</span><span class="p">[</span><span class="n">a_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">b_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">c_idx</span><span class="p">],</span> <span class="n">state_list</span><span class="p">[</span><span class="n">d_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">make_block</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="p">,</span> <span class="n">counter_int</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="se">\n</span><span class="s">    Generates one 64-byte block of bits, allowing control over the</span><span class="se">\n</span><span class="s">    number of rounds executed.</span><span class="se">\n</span><span class="s">    </span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)</span><span class="o">!=</span> <span class="mi">32</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">Key must be 32 bytes</span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">nonce_bytes</span><span class="p">)</span><span class="o">!=</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">Nonce must be 12 bytes</span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">rounds_to_execute</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">rounds_to_execute must be between 1 and 8 for this modified version.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">16</span>
+    <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_constants_tuple</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">key_words</span> <span class="o">=</span> <span class="nf">bytes_to_words</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">)</span>
+        <span class="n">nonce_words</span> <span class="o">=</span> <span class="nf">bytes_to_words</span><span class="p">(</span><span class="n">nonce_bytes</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Error converting key/nonce to words: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">state</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">key_words</span>
+    <span class="n">state</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">counter_int</span> <span class="o">&amp;</span> <span class="mi">4294967295</span>
+    <span class="n">state</span><span class="p">[</span><span class="mi">13</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="n">nonce_words</span>
+    <span class="n">initial_state_snapshot</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">qr_operations_sequence</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> 
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nf">mix_bits</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">rounds_to_execute</span><span class="p">):</span>
+        <span class="n">qr_operations_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">state</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nf">add32</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">initial_state_snapshot</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nf">words_to_bytes</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">struct</span><span class="p">.</span><span class="n">zeros</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_bytes</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="p">,</span> <span class="n">initial_counter_int</span><span class="p">,</span> <span class="n">data_bytes</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="se">\n</span><span class="s">    Encrypts or decrypts data using a mysterious cipher.</span><span class="se">\n</span><span class="s">    The num_double_rounds parameter is implicitly 1 (one application of the round structure),</span><span class="se">\n</span><span class="s">    with the actual mixing controlled by rounds_to_execute.</span><span class="se">\n</span><span class="s">    </span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="c1">#print("get_bytes", hexlify(key_bytes), hexlify(nonce_bytes), initial_counter_int, hexlify(data_bytes), current_constants_tuple, rounds_to_execute)
+</span>    <span class="n">output_byte_array</span> <span class="o">=</span> <span class="nf">bytearray</span><span class="p">()</span>
+    <span class="n">current_counter</span> <span class="o">=</span> <span class="n">initial_counter_int</span> <span class="o">&amp;</span> <span class="mi">4294967295</span>
+    <span class="n">data_len</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+    <span class="n">block_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">block_idx</span> <span class="o">&lt;</span> <span class="n">data_len</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">keystream_block</span> <span class="o">=</span> <span class="nf">make_block</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="p">,</span> <span class="n">current_counter</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="n">rounds_to_execute</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nc">Exception</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Error in make_block during stream processing for counter </span><span class="si">{</span><span class="n">current_counter</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+        <span class="c1">#1 print("make_block", block_idx, hexlify(keystream_block))
+</span>        <span class="n">remaining_data_in_block</span> <span class="o">=</span> <span class="n">data_len</span> <span class="o">-</span> <span class="n">block_idx</span>
+        <span class="n">chunk_len</span> <span class="o">=</span> <span class="nf">min</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">remaining_data_in_block</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">chunk_len</span><span class="p">):</span>
+            <span class="n">output_byte_array</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">[</span><span class="n">block_idx</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">keystream_block</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">block_idx</span> <span class="o">+=</span> <span class="mi">64</span>
+        <span class="k">if</span> <span class="n">block_idx</span> <span class="o">&lt;</span> <span class="n">data_len</span><span class="p">:</span>
+            <span class="n">current_counter</span> <span class="o">=</span> <span class="n">current_counter</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&amp;</span> <span class="mi">4294967295</span>
+            <span class="k">if</span> <span class="n">current_counter</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">initial_counter_int</span><span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_len</span> <span class="o">&gt;</span> <span class="mi">64</span><span class="p">):</span>
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Warning: counter for nonce </span><span class="si">{</span><span class="n">nonce_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span><span class="si">}</span><span class="s"> wrapped around to 0 during a multi-block message.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="c1">#2 print("output_byte", hexlify(bytes(output_byte_array)))
+</span>    <span class="k">return</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">output_byte_array</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">increment_byte_array_le</span><span class="p">(</span><span class="n">byte_arr</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_bytes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="sh">"""</span><span class="s">Increments a little-endian byte array representing an integer by a given amount.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">byte_arr</span><span class="p">)</span><span class="o">!=</span> <span class="n">num_bytes</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Input byte_arr length must be </span><span class="si">{</span><span class="n">num_bytes</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="nf">from_bytes</span><span class="p">(</span><span class="n">byte_arr</span><span class="p">,</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">+</span> <span class="n">amount</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">num_bytes</span> <span class="o">*</span> <span class="mi">8</span>
+    <span class="n">new_val_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">%</span> <span class="n">max_val</span><span class="p">).</span><span class="nf">to_bytes</span><span class="p">(</span><span class="n">num_bytes</span><span class="p">,</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">bytearray</span><span class="p">(</span><span class="n">new_val_bytes</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">construct_structured_key</span><span class="p">(</span><span class="n">active_material_hex</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="sh">"""</span><span class="s"> Constructs a 32-byte key. If structured, uses 16 bytes of active material.</span><span class="sh">"""</span>  <span class="c1"># inserted
+</span>    <span class="n">key_words_int</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">active_material_hex</span><span class="p">)</span><span class="o">!=</span> <span class="mi">32</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">For patterned keys (</span><span class="se">\'</span><span class="s">pattern_a</span><span class="se">\'</span><span class="s">, </span><span class="se">\'</span><span class="s">pattern_b</span><span class="se">\'</span><span class="s">), active_material_hex must be 16 bytes (32 hex characters).</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">active_material_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">active_material_hex</span><span class="p">)</span>
+    <span class="n">am_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">get_am_word</span><span class="p">():</span>
+        <span class="k">nonlocal</span> <span class="n">am_idx</span>  <span class="c1"># inserted
+</span>        <span class="k">if</span> <span class="n">am_idx</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="nf">len</span><span class="p">(</span><span class="n">active_material_bytes</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="sh">'</span><span class="s">Not enough active material for the 4 active key words.</span><span class="sh">'</span><span class="p">)</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="nf">from_bytes</span><span class="p">(</span><span class="n">active_material_bytes</span><span class="p">[</span><span class="n">am_idx</span><span class="p">:</span><span class="n">am_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">],</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span>
+        <span class="n">am_idx</span> <span class="o">+=</span> <span class="mi">4</span>
+        <span class="k">return</span> <span class="n">word</span>
+    <span class="n">key_words_int</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nf">get_am_word</span><span class="p">()</span>
+    <span class="n">key_words_int</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="nf">get_am_word</span><span class="p">()</span>
+    <span class="n">key_words_int</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="nf">get_am_word</span><span class="p">()</span>
+    <span class="n">key_words_int</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="nf">get_am_word</span><span class="p">()</span>
+    <span class="n">key_bytes_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">word_int</span> <span class="ow">in</span> <span class="n">key_words_int</span><span class="p">:</span>
+        <span class="n">key_bytes_list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">word_int</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">))</span>
+    <span class="k">return</span> <span class="sa">b</span><span class="sh">''</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">key_bytes_list</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">generate_challenge_data</span><span class="p">(</span><span class="n">flag_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rounds_to_run</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message_size_bytes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">known_key_active_material_hex</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">secret_target_nonce_hex</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">secret_target_counter_int</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_nonce_variations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_counter_variations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_package_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Starting CTF challenge package generation: </span><span class="si">{</span><span class="n">output_package_file</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">selected_constants</span> <span class="o">=</span> <span class="n">struct</span><span class="p">.</span><span class="n">zeros</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">secret_target_nonce_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">secret_target_nonce_hex</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">FATAL ERROR: Invalid hex in secret_target_nonce_hex: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">known_structured_key_bytes</span> <span class="o">=</span> <span class="nf">construct_structured_key</span><span class="p">(</span><span class="n">known_key_active_material_hex</span><span class="p">)</span>
+    <span class="n">known_structured_key_hex</span> <span class="o">=</span> <span class="n">known_structured_key_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">INFO: Known structured key for player: </span><span class="si">{</span><span class="n">known_structured_key_hex</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="c1">#p_common_bytes = os.urandom(message_size_bytes)
+</span>    <span class="n">p_common_bytes</span> <span class="o">=</span> <span class="nf">unhexlify</span><span class="p">(</span><span class="sh">'</span><span class="s">9de16236ae1521cffe67ab68fd1325951b2a1b11b75bec946325faca2a8db02a013b9c18ddd31f168e6dd472ebccdfc7d92c85e96546e822dd7002a2691f9392</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">p_common_hex</span> <span class="o">=</span> <span class="n">p_common_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">INFO: Generated P_common (</span><span class="si">{</span><span class="n">message_size_bytes</span><span class="si">}</span><span class="s"> bytes) for learning dataset.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">learning_dataset_entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_learning_samples</span> <span class="o">=</span> <span class="n">num_nonce_variations</span> <span class="o">*</span> <span class="n">num_counter_variations</span>
+    <span class="n">base_learning_nonce_suffix_start</span> <span class="o">=</span> <span class="nf">bytearray</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="n">base_learning_counter_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sample_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">num_nonce_variations</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">num_counter_variations</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_nonce_variations</span><span class="p">):</span>
+        <span class="n">nonce</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span>
+        <span class="n">current_nonce_bytes</span> <span class="o">=</span> <span class="nf">increment_byte_array_le</span><span class="p">(</span><span class="n">base_learning_nonce_suffix_start</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">current_nonce_hex</span> <span class="o">=</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">current_nonce_bytes</span><span class="p">).</span><span class="nf">hex</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_counter_variations</span><span class="p">):</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span>
+            <span class="n">current_counter_int</span> <span class="o">=</span> <span class="n">base_learning_counter_start</span> <span class="o">+</span> <span class="n">counter</span>
+            <span class="n">sample_id</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">'</span><span class="s">sample_n</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s">_c</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="sh">'</span>
+            <span class="n">c_i_bytes</span> <span class="o">=</span> <span class="nf">get_bytes</span><span class="p">(</span><span class="n">key_bytes</span><span class="o">=</span><span class="n">known_structured_key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="o">=</span><span class="nf">bytes</span><span class="p">(</span><span class="n">current_nonce_bytes</span><span class="p">),</span> <span class="n">initial_counter_int</span><span class="o">=</span><span class="n">current_counter_int</span><span class="p">,</span> <span class="n">data_bytes</span><span class="o">=</span><span class="n">p_common_bytes</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="o">=</span><span class="n">selected_constants</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="n">rounds_to_run</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">get_bytes</span><span class="sh">"</span><span class="p">,</span> <span class="nf">hexlify</span><span class="p">(</span><span class="n">known_structured_key_bytes</span><span class="p">),</span> <span class="nf">hexlify</span><span class="p">(</span><span class="nf">bytes</span><span class="p">(</span><span class="n">current_nonce_bytes</span><span class="p">)),</span> <span class="n">current_counter_int</span><span class="p">,</span> <span class="nf">hexlify</span><span class="p">(</span><span class="n">p_common_bytes</span><span class="p">),</span> <span class="n">selected_constants</span><span class="p">,</span> <span class="n">rounds_to_run</span><span class="p">)</span>
+            <span class="n">learning_dataset_entries</span><span class="p">.</span><span class="nf">append</span><span class="p">({</span><span class="sh">'</span><span class="s">sample_id</span><span class="sh">'</span><span class="p">:</span> <span class="n">sample_id</span><span class="p">,</span> <span class="sh">'</span><span class="s">plaintext_hex</span><span class="sh">'</span><span class="p">:</span> <span class="n">p_common_hex</span><span class="p">,</span> <span class="sh">'</span><span class="s">ciphertext_hex</span><span class="sh">'</span><span class="p">:</span> <span class="n">c_i_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">(),</span> <span class="sh">'</span><span class="s">nonce_hex</span><span class="sh">'</span><span class="p">:</span> <span class="n">current_nonce_hex</span><span class="p">,</span> <span class="sh">'</span><span class="s">counter_int</span><span class="sh">'</span><span class="p">:</span> <span class="n">current_counter_int</span><span class="p">})</span>
+            <span class="n">sample_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nf">if </span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_nonce_variations</span> <span class="o">//</span> <span class="mi">10</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">num_nonce_variations</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">  Generated learning data for nonce variation </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s">/</span><span class="si">{</span><span class="n">num_nonce_variations</span><span class="si">}</span><span class="s">...</span><span class="sh">'</span><span class="p">)</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Generated </span><span class="si">{</span><span class="n">sample_count</span><span class="si">}</span><span class="s"> total learning samples.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">p_secret_flag_bytes</span> <span class="o">=</span> <span class="n">flag_string</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Encrypting the secret flag string (</span><span class="se">\'</span><span class="si">{</span><span class="n">flag_string</span><span class="p">[</span><span class="si">:</span><span class="mi">20</span><span class="p">]</span><span class="si">}</span><span class="s">...</span><span class="se">\'</span><span class="s">) with the KNOWN key using SECRET target_nonce/counter...</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">c_target_flag_bytes</span> <span class="o">=</span> <span class="nf">get_bytes</span><span class="p">(</span><span class="n">key_bytes</span><span class="o">=</span><span class="n">known_structured_key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="o">=</span><span class="n">secret_target_nonce_bytes</span><span class="p">,</span> <span class="n">initial_counter_int</span><span class="o">=</span><span class="n">secret_target_counter_int</span><span class="p">,</span> <span class="n">data_bytes</span><span class="o">=</span><span class="n">p_secret_flag_bytes</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="o">=</span><span class="n">selected_constants</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="n">rounds_to_run</span><span class="p">)</span>
+    <span class="n">c_target_flag_hex</span> <span class="o">=</span> <span class="n">c_target_flag_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="n">challenge_package_data</span> <span class="o">=</span> <span class="p">{</span><span class="sh">'</span><span class="s">cipher_parameters</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span><span class="sh">'</span><span class="s">key</span><span class="sh">'</span><span class="p">:</span> <span class="n">known_structured_key_hex</span><span class="p">,</span> <span class="sh">'</span><span class="s">common_plaintext</span><span class="sh">'</span><span class="p">:</span> <span class="n">p_common_hex</span><span class="p">},</span> <span class="sh">'</span><span class="s">learning_dataset_for_player</span><span class="sh">'</span><span class="p">:</span> <span class="n">learning_dataset_entries</span><span class="p">,</span> <span class="sh">'</span><span class="s">flag_ciphertext</span><span class="sh">'</span><span class="p">:</span> <span class="n">c_target_flag_hex</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">output_package_file</span><span class="p">,</span> <span class="sh">'</span><span class="s">w</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="p">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">challenge_package_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">Successfully wrote challenge package to </span><span class="si">{</span><span class="n">output_package_file</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">FATAL ERROR: Could not write package </span><span class="si">{</span><span class="n">output_package_file</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+    <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\n</span><span class="s">CTF Data generation complete.</span><span class="sh">'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">known_key_active_material_hex</span> <span class="o">=</span> <span class="sh">'</span><span class="s">5c54700231f4727bf7d49234e7bbb1c9</span><span class="sh">'</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="nc">ArgumentParser</span><span class="p">(</span><span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="p">.</span><span class="n">RawTextHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--output_file</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sh">'</span><span class="s">ctf_challenge_package_test.json</span><span class="sh">'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Filename for the single JSON challenge package.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--flag_string</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sh">'</span><span class="s">CTF{TestFlag_123456789012345678901234567890123456789012345678}</span><span class="sh">'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">The actual secret flag string to be encrypted.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--rounds</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Actual number of rounds to execute (1-8, default: 2 for a very weak variant).</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--message_size_bytes</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Size of P_common in learning dataset (bytes, default: 64).</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--known_key_active_material_hex</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">known_key_active_material_hex</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Hex string for the non-zero part of the known key. </span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--secret_target_nonce_hex</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="sh">'</span><span class="s">000000800000000000000000</span><span class="sh">'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">SECRET nonce (hex, 24 chars, first 4 hex chars/2 bytes must be </span><span class="se">\'</span><span class="s">0000</span><span class="se">\'</span><span class="s">) to be recovered by player. Typically from set_secrets.sh.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--secret_target_counter_int</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2147483648</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">SECRET counter to be recovered by player. Typically from set_secrets.sh.</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--num_nonce_variations</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Number of distinct nonce patterns for learning set (default: 32).</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">'</span><span class="s">--num_counter_variations</span><span class="sh">'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sh">'</span><span class="s">Number of distinct counter values for each nonce pattern in learning set (default: 32).</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="nf">parse_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">args</span><span class="p">.</span><span class="n">rounds</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: --rounds must be 1-8.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">known_key_active_material_hex</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: --known_key_active_material_hex invalid hex.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">secret_target_nonce_hex</span><span class="p">)</span><span class="o">!=</span> <span class="mi">24</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">args</span><span class="p">.</span><span class="n">secret_target_nonce_hex</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="sh">'</span><span class="s">0000</span><span class="sh">'</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: --secret_target_nonce_hex must be 24 hex chars and start with </span><span class="se">\'</span><span class="s">0000</span><span class="se">\'</span><span class="s">.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">secret_target_nonce_hex</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: --secret_target_nonce_hex invalid hex.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">num_nonce_variations</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">args</span><span class="p">.</span><span class="n">num_counter_variations</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: Variation counts must be at least 1.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">message_size_bytes</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">ERROR: --message_size_bytes must be at least 1.</span><span class="sh">'</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">output_package_file_path</span> <span class="o">=</span> <span class="nc">Path</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">output_file</span><span class="p">)</span>
+    <span class="n">output_package_file_path</span><span class="p">.</span><span class="n">parent</span><span class="p">.</span><span class="nf">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="nf">generate_challenge_data</span><span class="p">(</span><span class="n">flag_string</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">flag_string</span><span class="p">,</span> <span class="n">rounds_to_run</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">rounds</span><span class="p">,</span> <span class="n">message_size_bytes</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">message_size_bytes</span><span class="p">,</span> <span class="n">known_key_active_material_hex</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">known_key_active_material_hex</span><span class="p">,</span> <span class="n">secret_target_nonce_hex</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">secret_target_nonce_hex</span><span class="p">,</span> <span class="n">secret_target_counter_int</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">secret_target_counter_int</span><span class="p">,</span> <span class="n">num_nonce_variations</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">num_nonce_variations</span><span class="p">,</span> <span class="n">num_counter_variations</span><span class="o">=</span><span class="n">args</span><span class="p">.</span><span class="n">num_counter_variations</span><span class="p">,</span> <span class="n">output_package_file</span><span class="o">=</span><span class="n">output_package_file_path</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="n">secret_target_nonce_hex</span> <span class="o">=</span> <span class="sh">'</span><span class="s">000010000000000000000000</span><span class="sh">'</span><span class="p">,</span> <span class="n">secret_target_counter_int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">rounds</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">message_size_bytes</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">known_key_active_material_hex</span> <span class="o">=</span> <span class="sh">'</span><span class="s">5c54700231f4727bf7d49234e7bbb1c9</span><span class="sh">'</span>
+    <span class="c1">#secret_target_nonce_hex = '000010000000000000000000'
+</span>    <span class="c1">#secret_target_counter_int = 1
+</span>    
+    <span class="n">selected_constants</span> <span class="o">=</span> <span class="n">struct</span><span class="p">.</span><span class="n">zeros</span>
+    <span class="n">secret_target_nonce_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">secret_target_nonce_hex</span><span class="p">)</span>
+    <span class="n">known_structured_key_bytes</span> <span class="o">=</span> <span class="nf">construct_structured_key</span><span class="p">(</span><span class="n">known_key_active_material_hex</span><span class="p">)</span>
+    <span class="n">known_structured_key_hex</span> <span class="o">=</span> <span class="n">known_structured_key_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="c1">#print(f'INFO: Known structured key for player: {known_structured_key_hex}')
+</span>    <span class="c1">#p_common_bytes = os.urandom(message_size_bytes)
+</span>    <span class="n">p_common_bytes</span> <span class="o">=</span> <span class="nf">unhexlify</span><span class="p">(</span><span class="sh">'</span><span class="s">692f09e677335f6152655f67304e6e40141fa702e7e5b95b46756e63298d80a9bcbbd95465795f21ef0a</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">p_common_hex</span> <span class="o">=</span> <span class="n">p_common_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="n">flag_string</span> <span class="o">=</span> <span class="n">p_common_hex</span>
+    <span class="n">p_secret_flag_bytes</span> <span class="o">=</span> <span class="n">p_common_bytes</span>
+    <span class="c1">#print(f'Encrypting the secret flag string (\'{flag_string[:20]}...\') with the KNOWN key using SECRET target_nonce/counter...')
+</span>    <span class="n">c_target_flag_bytes</span> <span class="o">=</span> <span class="nf">get_bytes</span><span class="p">(</span><span class="n">key_bytes</span><span class="o">=</span><span class="n">known_structured_key_bytes</span><span class="p">,</span> <span class="n">nonce_bytes</span><span class="o">=</span><span class="n">secret_target_nonce_bytes</span><span class="p">,</span> <span class="n">initial_counter_int</span><span class="o">=</span><span class="n">secret_target_counter_int</span><span class="p">,</span>
+                                    <span class="n">data_bytes</span><span class="o">=</span><span class="n">p_common_bytes</span><span class="p">,</span> <span class="n">current_constants_tuple</span><span class="o">=</span><span class="n">selected_constants</span><span class="p">,</span> <span class="n">rounds_to_execute</span><span class="o">=</span><span class="n">rounds</span><span class="p">)</span>
+    <span class="n">c_target_flag_hex</span> <span class="o">=</span> <span class="n">c_target_flag_bytes</span><span class="p">.</span><span class="nf">hex</span><span class="p">()</span>
+    <span class="c1">#print(c_target_flag_hex)
+</span>    <span class="n">flag</span> <span class="o">=</span> <span class="nf">unhexlify</span><span class="p">(</span><span class="n">c_target_flag_hex</span><span class="p">)</span>
+    <span class="k">if</span> <span class="sa">b</span><span class="sh">'</span><span class="s">CTF{w3</span><span class="sh">'</span> <span class="ow">in</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="nf">bin</span><span class="p">(</span><span class="n">secret_target_counter_int</span><span class="p">))</span>
+    <span class="c1">#challenge_package_data = {'cipher_parameters': {'key': known_structured_key_hex, 'common_plaintext': p_common_hex}, 'learning_dataset_for_player': learning_dataset_entries, 'flag_ciphertext': c_target_flag_hex}
+</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">'</span><span class="s">__main__</span><span class="sh">'</span><span class="p">:</span>
+    <span class="c1">#main()
+</span>    <span class="k">for</span> <span class="n">counter</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">25600</span><span class="p">):</span>
+        <span class="nf">solve</span><span class="p">(</span><span class="sh">'</span><span class="s">000022200000000000000000</span><span class="sh">'</span><span class="p">,</span> <span class="n">counter</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span>
+    <span class="c1">#solve('000010000000000000001000', 2)
+</span></code></pre></div></div>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>c0derpwner</b>
+    </span>
+    
+    <span>© 2025</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

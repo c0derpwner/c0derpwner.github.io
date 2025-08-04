@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Misc_Evalutative</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Misc_Evalutative | c0derpwner BlogSpot</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Misc_Evalutative" />
+<meta name="author" content="c0derpwnergit remote add origin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Evaluating a Polynomial in Python" />
+<meta property="og:description" content="Evaluating a Polynomial in Python" />
+<link rel="canonical" href="http://localhost:4000/Misc_Evalutative" />
+<meta property="og:url" content="http://localhost:4000/Misc_Evalutative" />
+<meta property="og:site_name" content="c0derpwner BlogSpot" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-12T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Misc_Evalutative" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"c0derpwnergit remote add origin","url":"https://ashishchaudhary.in/hacker-blog"},"dateModified":"2025-04-12T00:00:00+02:00","datePublished":"2025-04-12T00:00:00+02:00","description":"Evaluating a Polynomial in Python","headline":"Misc_Evalutative","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/Misc_Evalutative"},"url":"http://localhost:4000/Misc_Evalutative"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>c0derpwner@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Misc_Evalutative</h2>
+  <time datetime="2025-04-12T00:00:00+02:00" class="by-line">12 Apr 2025</time>
+  <p>Evaluating a Polynomial in Python</p>
+
+<p>In mathematics and computer science, evaluating a polynomial at a given point is a common task. This article explains a simple Python script that accomplishes this. The polynomial is expressed in the following form:
+P(x)=a0+a1x+a2x2+⋯+an−1xn−1
+P(x)=a0​+a1​x+a2​x2+⋯+an−1​xn−1</p>
+
+<p>where a0,a1,…,an−1a0​,a1​,…,an−1​ are the coefficients, and xx is the value at which the polynomial is evaluated.
+The Python Code</p>
+
+<p>Below is the Python code that reads the coefficients and the evaluation point, then computes and prints the polynomial’s value:</p>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Read coefficients (e.g., "1 -2 3" for polynomial 1 - 2x + 3x^2)
+</span><span class="n">coefficients</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nf">input</span><span class="p">().</span><span class="nf">split</span><span class="p">()))</span>
+
+<span class="c1"># Read the evaluation point, x
+</span><span class="n">x</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">input</span><span class="p">())</span>
+
+<span class="c1"># Initialize result
+</span><span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Evaluate the polynomial: a0 + a1*x + a2*x^2 + ... + a_{n-1}*x^{n-1}
+</span><span class="k">for</span> <span class="n">power</span><span class="p">,</span> <span class="n">coef</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">coefficients</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">+=</span> <span class="n">coef</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="n">power</span><span class="p">)</span>
+
+<span class="c1"># Print the evaluated result
+</span><span class="nf">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="detailed-explanation">Detailed Explanation</h3>
+
+<ol>
+  <li>
+    <p>Reading the Input</p>
+
+    <p>Coefficients:
+ The line:</p>
+  </li>
+</ol>
+
+<p>coefficients = list(map(int, input().split()))</p>
+
+<p>reads a single line of space-separated integers. For instance, if you input:</p>
+
+<p>1 -2 3 it produces a list of integers: [1, -2, 3]</p>
+
+<p>This list represents the coefficients a0a0​, a1a1​, and a2a2​ of the polynomial:
+P(x)=1−2x+3x2
+P(x)=1−2x+3x2</p>
+
+<p>Evaluation Point:
+The next line:</p>
+
+<p><code class="language-plaintext highlighter-rouge">x = int(input())</code></p>
+
+<p>reads another input which is the value of xx where the polynomial will be evaluated. For example, if you input: 2 then x=2x=2.</p>
+
+<p>by the way input() can be done also like this:</p>
+
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="sh">""</span><span class="p">):</span>
+    <span class="n">random_values</span> <span class="o">=</span> <span class="sh">"</span><span class="s"> </span><span class="sh">"</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">str</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="nf">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">random_values</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">random_values</span>
+</code></pre></div></div>
+
+<h4 id="polynomial-evaluation">Polynomial Evaluation</h4>
+
+<p>The polynomial is computed using a loop:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Initialization:
+</code></pre></div></div>
+
+<p>result = 0</p>
+
+<p>initializes a variable to accumulate the sum of each term.</p>
+
+<p>Looping Over Coefficients:
+The loop:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for power, coef in enumerate(coefficients):
+    result += coef * (x ** power)
+
+works as follows:
+
+    enumerate(coefficients) iterates over the list, providing both the index (power) and the coefficient (coef).
+
+    For each coefficient, the term coef×xpowercoef×xpower is computed.
+
+    This term is added to result.
+</code></pre></div></div>
+
+<ol>
+  <li>Mathematical Breakdown</li>
+</ol>
+
+<p>The code implements the mathematical formula for polynomial evaluation:
+P(x)=∑i=0n−1aixi
+P(x)=i=0∑n−1​ai​xi</p>
+
+<p>For each term:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aiai​ is the coefficient at position ii,
+
+xixi is xx raised to the power ii.
+</code></pre></div></div>
+
+<p>The loop iterates over each coefficient and calculates the term aixiai​xi before adding it to the cumulative result.</p>
+<ol>
+  <li>Example Walkthrough</li>
+</ol>
+
+<p>Let’s consider an example:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input Coefficients:
+</code></pre></div></div>
+
+<p>1 -2 3</p>
+
+<p>represents the polynomial:
+P(x)=1−2x+3x2
+P(x)=1−2x+3x2</p>
+
+<p>Input Evaluation Point:</p>
+
+<p>2</p>
+
+<p>Calculation:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>For i=0i=0: 1×20=11×20=1
+
+For i=1i=1: −2×21=−4−2×21=−4
+
+For i=2i=2: 3×22=123×22=12
+</code></pre></div></div>
+
+<p>Summing these up:
+P(2)=1−4+12=9
+P(2)=1−4+12=9</p>
+
+<p>Output: The script prints:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>9
+</code></pre></div></div>
+
+<p>Conclusion</p>
+
+<p>This Python script is a straightforward implementation of polynomial evaluation using basic programming constructs. By reading a list of coefficients and an evaluation point from the user, it computes the polynomial value using a loop and the power operator. This approach not only demonstrates fundamental programming skills but also illustrates how mathematical concepts are implemented in code.</p>
+
+<p>Whether you’re working on homework, developing mathematical software, or just learning Python, this example provides a clear method to combine programming with mathematics.</p>
+
+<p><img src="/assets/ach/misc_evaluative.png" alt="ach" /></p>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>c0derpwner</b>
+    </span>
+    
+    <span>© 2025</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

