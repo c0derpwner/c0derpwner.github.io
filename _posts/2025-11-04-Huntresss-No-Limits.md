@@ -11,7 +11,7 @@ published: true
 
 
 
-![[assets/Pasted image 20251104174229.png]]
+![](assets/no_limits.png)
 
 
 This challenge presents a **sandboxed Linux binary** that allows dynamic memory allocation and execution of user-supplied shellcode. A **seccomp** filter is used to restrict certain syscalls, and Address Space Layout Randomization (ASLR) is enabled. The goal is to **read and print the contents of `/flag.txt`** without traditional command execution.
@@ -211,4 +211,4 @@ And here is the flag
 [+] Flag: flag{6f6c733424f20f22303fd47aeb991425}
 ```
 
-![](https://tenor.com/view/gandalf-lotr-pwn-pwned-gif-12414379)
+![](assets/gandalf.gif)
