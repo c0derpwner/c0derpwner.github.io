@@ -367,7 +367,7 @@ Examining the memory at `R9` (address `0x7FF7285FD128`) and dumping 48 bytes rev
 00007FF7285FD148: 53 9F B3 1E 1C C1 34 42  42 0D 03 93 97 E9 17 77
 ```
 
-Since the total length is 48 bytes and AES-256 requires a 32-byte key and 16-byte IV, the data can be split as follows:
+Since the total length is 48 bytes and AES-256 requires a 32-byte key and2025-11-04-rust-tickler-3.md 16-byte IV, the data can be split as follows:
 
 **Extracted cryptographic material:**
 
